@@ -3,6 +3,7 @@ body{
 }
 
 #texteditor{
+	padding:0.5%;
 	width:50%;
 	height:90vh;
 	float: left;

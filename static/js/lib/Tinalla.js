@@ -1,4 +1,4 @@
-const cons = document.querySelector(".console");
+const cons = document.querySelector("#console");
 
 const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 	theme:"midnight", 
@@ -29,6 +29,10 @@ const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 			}catch(error){
 				cons.textContent = error;
 			}	
+		},
+		"Tab":function(f){
+			ParseEditor.focus();
+			ParseEditor.setCursor(0,0)
 		}
 	}
 });
@@ -45,7 +49,7 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 	mode:'javascript',
 	extraKeys: {
 		"Shift-Ctrl-Enter":function(){
-			const text = editor.getValue();
+			const text = ParseEditor.getValue();
 			//autosave()
 			try{
 				let evaluated = eval(text);
@@ -55,7 +59,7 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 			}
 		},
 		"Ctrl-Enter":function(f){
-			const text = editor.getLine(editor.getCursor().line);
+			const text = ParseEditor.getLine(ParseEditor.getCursor().line);
 			//autosave()
 			try{
 				let evaluated = eval(text);
@@ -63,7 +67,18 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 			}catch(error){
 				cons.textContent = error;
 			}	
+		},
+		"Tab":function(f){
+			TextEditor.focus();
+			TextEditor.setCursor(0,0)
 		}
 	}
 });
 
+
+
+TextEditor.setValue(`afasdfadsfsd fdios
+
+aaa -- -dios ---`)
+
+ParseEditor.setValue(`Parse(/dios/)`)
