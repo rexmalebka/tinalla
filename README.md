@@ -11,10 +11,43 @@ This was made, thinking of different ways of creating languages, parsing and loo
 ![example](example.jpg "example")
 ![example 2](example2.jpg "example 2")
 
-## docs
+## documentation
 
-you have two editors, the one in the right allows you to write all the logic of your language,
-the one on the left allows you to write fluid text.
+__Instalation__
+
+
+For installation it's necesary to have installed [node js](https://nodejs.org)
+
+```
+git clone https://github.com/axelkramble/tinalla.git
+npm install
+```
+
+For running the server in [http://127.0.0.1:3000](http://127.0.0.1:3000)
+
+```
+npm run start
+```
+
+__Usage__
+
+there are two editor, a text editor where it's possible to write fluid text and the parsing editor, where the parsing rules are written.
+
+
+*Parsing editor*
+* `Shift-Ctrl-Enter` : Executes all the lines.
+* `Ctrl-Enter` : Executes the current line / current selection.
+* `Tab` : Focus the text editor.
+
+*Text editor*
+* `Shift-Ctrl-Enter` : Executes the regex rules in all the text.
+* `Ctrl-Enter` : Executes the regex rules in the current line / current selection
+* `Tab` : Focus the parsing editor.
+* onchange : Executes the regex rules if these are registered with `onchange: true`
+
+__Documentation__
+
+For parsing rules and loop implementation:
 
 [function docs](./docs/functions.md)
 
