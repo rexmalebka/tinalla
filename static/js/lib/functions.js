@@ -1,7 +1,21 @@
 const socket = io('http://localhost:8000')
+
 socket.on('connect', function(){
 	console.log("connected");
 });
+
+socket.on('load', function(texteditor, parsereditor){
+	console.log("loading ")
+	TextEditor.setValue(texteditor)
+	ParseEditor.setValue(parsereditor)
+})
+
+window.onunload = ()=>{
+	socket.emit('save',
+		TextEditor.getValue(),
+		ParseEditor.getValue()
+	)
+}
 
 socket.on('event', function(data){
 	console.log("event",data)
@@ -12,10 +26,43 @@ socket.on('disconnect', function(){
 	console.log("disconnected");
 });
 
-const Server = function(ip, port){
+
+
+
+
+const Server = function(ip='localhost', port=57120){
 	return {
-		Parse : null,
-		Range: null,
+		Parse : function(rule, oscdir = '/tinalla', callback, opts={}){
+			let defopts ={
+				ip: ip,
+				port: port			
+			}
+			
+			for(i in opts){
+				defopts[i] = opts[i]
+			}
+			
+			return Parse(rule, oscdir, callback, defopts)
+		},
+		AddRule: function(rule, oscdir = '/tinalla', callback, opts={}){
+			let defopts ={
+				ip: ip,
+				port: port			
+			}
+			
+			for(i in opts){
+				defopts[i] = opts[i]
+			}
+			
+			return AddRule(rule, oscdir = '/tinalla', callback, defopts)
+		},		
+		send: function(oscdir, ...oscargs){
+			socket.emit('osc', oscdir, {
+				ip: ip,
+				port: port,
+				args: oscargs
+			})
+		}
 	}
 }
 
@@ -108,7 +155,7 @@ const Range = function(start, end, callback){
 		callback(range)
 	}else{
 		return {
-			Parse : function(rule, oscdir = '/tinalla', callback, _opts={}){
+			Parse : function(rule, oscdir = '/tinalla', callback,){
 				let opts = {start: start, end: end};
 				for(i in _opts){
 					opts[i] = _opts[i]
@@ -227,9 +274,9 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 			return res
 	}
 	let res = [];
+	let ret = [];
 	if (callback && typeof callback == 'function' ){
 		res = _parse();
-		let ret;
 		if(defopts.iterable){
 
 			res.forEach(function(found, n){
@@ -239,27 +286,29 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 					ret = callback(found);
 				}else if(callback.length == 2){
 					ret = callback(found, n);
+				}			
+				if(ret){
+					socket.emit('osc', oscdir, {
+						ip: defopts.ip,
+						port: defopts.port,
+						args: ret
+					})
 				}
-
-				if(Array.isArray(ret)){
-					socket.emit('osc', oscdir, ...ret)
-				}else if(ret){
-					socket.emit('osc', oscdir, ret)			
-				}
-			
 			})
 
 		}else{
 			if(res.length>0){
 				ret = callback(res);
-			
-				if(Array.isArray(ret)){
-					socket.emit('osc', oscdir, ...ret)
-				}else if(ret){
-					socket.emit('osc', oscdir, ret)			
+				if(ret){
+					socket.emit('osc', oscdir, {
+						ip: defopts.ip,
+						port: defopts.port,
+						args: ret
+					})
 				}
 			}
-		}
+		}		
+
 	}else{
 		res = _parse();
 		res.forEach((i)=>{
@@ -269,7 +318,11 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 			}else{
 				oscmsg = i.raw[0].splice(1)
 			}
-			socket.emit('osc', oscdir, oscmsg)
+			socket.emit('osc', oscdir, {
+				ip: defopts.ip,
+				port: defopts.port,
+				args: oscmsg
+			})
 		})
 	}
 	return res
@@ -361,73 +414,93 @@ RegExp.prototype.parse = function(oscdir = '/tinalla', callback, opts={}){
  * @property {Function} res.play - play function for the loop, returns a loop object.
  * @property {Function} res.stop - stops the loop.
  */
-Loop = function(timeout, sequence, times="inf"){
-	const hash = sequence.map((seq)=>seq.toString().hashCode()).reduce((a,b)=> a+b)
-	return {
-		play : function(){
-			let a = new Date();
-			const ff = function(){
-				let loop = Tinalla.loops[hash];
+const Loop = function(timeout=[], sequence=[], times='inf'){
 
-				if((new Date() - a) < (Array.isArray(loop.timeout) ? loop.timeout[loop.count % loop.timeout.length] : loop.timeout ) ){
-					loop.id = requestAnimationFrame(ff);
-					//Tinalla.loops[hash].id = requestAnimationFrame(ff)
-				}else{
-					console.log(times, loop.count,"*")
-					if(times != "inf" && loop.count == times){
-						cancelAnimationFrame(loop.id)
-						delete Tinalla.loops[hash];									
-					}else{
-						loop.count++;
-						/*
-						Tinalla.loops[hash].count++;
-						**/
-						//Tinalla.loops[hash].sequence[Tinalla.loops[hash].count % Tinalla.loops[hash].sequence.length ]()
-						loop.sequence[loop.count % loop.sequence.length]()
-						a = new Date();
-						loop.id = requestAnimationFrame(ff);
-							//Tinalla.loops[hash].id = requestAnimationFrame(ff)
-					}
+	timeout = Array.isArray(timeout) ? timeout : [timeout];
+	sequence = Array.isArray(sequence) ? sequence : [sequence];
 
-				}
-			}
-
-
-			if(!Tinalla.loops.hasOwnProperty(hash)){
-				
-				Tinalla.loops[hash] = {
-					id:0, 
-					sequence : sequence,
-					timeout: timeout, 
-					callback: null, 
-					count: 0, 
-					times : times
-				}
-				Tinalla.loops[hash].id = requestAnimationFrame(ff);
-			}else{
-				if(timeout != Tinalla.loops[hash].timeout || times != Tinalla.loops[hash].times){
-					this.stop()	
-					Tinalla.loops[hash] = {
-						id:0, 
-						sequence : sequence,
-						timeout: timeout, 
-						callback: null, 
-						count: 0, 
-						times : times
-					}
-					Tinalla.loops[hash].id = requestAnimationFrame(ff);
-				}
-			}
+	if(timeout.length==0 || sequence.length==0) return null
+	if(timeout.length>0 && sequence.length>0){
+		const hash = sequence.map((seq)=>seq.toString().hashCode()).reduce((a,b)=> a+b);
+		if(Tinalla.loops.hasOwnProperty(hash)){
+			Tinalla.loops[hash].timeout = timeout;
+			Tinalla.loops[hash].times = times;
 			return Tinalla.loops[hash]
-		},
-		stop : function(){
-			if(Tinalla.loops.hasOwnProperty(hash)){
-				cancelAnimationFrame(Tinalla.loops[hash].id)
-				delete Tinalla.loops[hash];
+		}
+		return {
+			_generator: function*(){
+				while(Tinalla.loops[hash].playing){
+					let t1 = new Date();
+					const rloop = function(){
+						if(!Tinalla.loops.hasOwnProperty(hash))	return false
+						if((new Date() - t1) < Tinalla.loops[hash].timeout[(Tinalla.loops[hash].count % Tinalla.loops[hash].timeout.length)] ){
+							cancelAnimationFrame(Tinalla.loops[hash].idx)
+							Tinalla.loops[hash].idx = requestAnimationFrame(rloop)
+						}else{
+							let exf = new Promise(function(resolve, reject){
+								Tinalla.loops[hash].sequence[Tinalla.loops[hash].count % Tinalla.loops[hash].sequence.length]()
+								resolve();
+							});
+							Tinalla.loops[hash].step();
+						}
+					};
+					Tinalla.loops[hash].count++;
+
+						yield requestAnimationFrame(rloop)
+				}
+			},
+			play: function(){
+				if(!Tinalla.loops.hasOwnProperty(hash)){
+					Tinalla.loops[hash] = {
+						hash: hash,
+						timeout: timeout,
+						sequence: sequence,
+						times:times,
+						playing: false,
+						idx: 0,
+						_count:0,
+						get count(){
+
+							return this._count;
+						},
+						set count(value){
+							if(Tinalla.loops[hash].times != 'inf'){
+								if(Tinalla.loops[hash].count == Tinalla.loops[hash].times*Tinalla.loops[hash].sequence.length){
+									Tinalla.loops[hash].stop()
+									return true
+								}
+							}
+							this._count = value
+							return false
+						},
+						current:0,
+						gen: this._generator(),
+						step: function(){
+							if(Tinalla.loops[hash].count >=0){
+								this.idx = this.gen.next()
+								return this
+							}
+						},
+						stop: function(){
+							Tinalla.loops[hash].playing = false;
+							cancelAnimationFrame(Tinalla.loops[hash].idx)
+							delete Tinalla.loops[hash]
+							return this
+						},
+					};
+					Tinalla.loops[hash].playing = true;
+				}else if(!Tinalla.loops[hash].playing){
+					Tinalla.loops[hash].playing = true
+				}
+				return Tinalla.loops[hash].step()
+			},
+			stop: function(){
+				Tinalla.loops[hash].stop()
 			}
 		}
 	}
-};
+}
+
 
 function flashtext(from, to, bgcolor){
 	// from and to look like this: {line: 0, ch: 2}, {line:1, ch:0}
@@ -444,6 +517,7 @@ function flashtext(from, to, bgcolor){
 	setTimeout(deletemark, 250) //after certain time clear the mark
 }
 
-clock = function(bpm){
 
-}
+
+
+

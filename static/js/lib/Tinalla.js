@@ -10,6 +10,14 @@ const cons = document.querySelector("#console");
 const Tinalla = {
 	loops : new Proxy({},{
 		get: function(obj, prop){
+			if(prop == "hush"){
+				return ()=>{
+					for(i in obj){
+						cancelAnimationFrame(obj[i]);
+						delete obj[i];
+					}
+				}
+			}
 			return obj[prop]
 		},
 		set: function(obj, prop, value){
@@ -27,6 +35,8 @@ const Tinalla = {
 		}
 	})
 }
+
+Hush = Tinalla.loops.hush;
 
 const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 	theme:"midnight", 

@@ -5,6 +5,7 @@ const config = require('./config.js');
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+const fs = require('fs')
 
 const OSCServer = new osc.UDPPort({
 	localAddress: config.OSCLocalAddr,
@@ -20,6 +21,26 @@ OSCServer.on('ready', function(){
 
 	io.on('connection', function(socket){
 		console.log('Connected.');
+
+		const autosaved = fs.readFile("autosaved.json",'utf8', (error, data)=>{
+			if(error){
+				socket.emit('load','','')
+			}else{
+				const dataparsed = JSON.parse(data)
+				socket.emit('load',dataparsed.texteditor, dataparsed.parsereditor)
+			}	
+		})
+
+		socket.on('save',function(text, parser){
+			fs.writeFile("autosaved.json",
+				JSON.stringify(
+					{
+						texteditor: text, 
+						parsereditor: parser
+					}),(err)=>{
+						if(err) console.log(err,"error saving 'autosaved.json'")
+					})
+		})
 		
 		socket.on('osc',function(...args){
 			let opts = {
@@ -27,17 +48,17 @@ OSCServer.on('ready', function(){
 				port: config.SCPort
 			};
 
-			const address = args[0];
+			const address = args[0].startsWith('/')? args[0] :'/'+args[0] ;
 
-			
 			if(args.length == 2 && typeof args[1] == 'object' && !Array.isArray(args[1])){
 				for(i in args[1]){
 					opts[i] = args[1][i];			
 				}
-				args = args[1].args;
+				args = Array.isArray(args[1].args) ? args[1].args : [args[1].args];
 			}else{
 				args = args.splice(1)
 			}
+
 			let oscargs = args.map((arg)=>{
 				if(Number.isInteger(arg)){
 					return {type: 'i', value: arg}
@@ -49,12 +70,17 @@ OSCServer.on('ready', function(){
 					return {type: 's', value: JSON.stringify(arg)}				
 				}
 			});
-			
-			console.log(`sending: ${address}, ${args}`)
-			OSCServer.send({
-				address: address,
-				args: oscargs
-			}, opts.ip, opts.port);
+			try{
+				console.log(`sending: ${opts.ip}:${opts.port} -> ${address}, ${args}`)
+				OSCServer.send({
+					address: address,
+					args: oscargs
+				}, opts.ip, opts.port);
+			}catch(error){
+				console.log(error)
+				console.log(`Error sending: ${opts.ip}:${opts.port} -> ${address}, ${args}`)			
+			}
+
 			
 		})
 	});
