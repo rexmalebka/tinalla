@@ -126,6 +126,8 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 		"Tab":function(f){
 			TextEditor.focus();
 			TextEditor.setCursor(0,0)
+		},
+		"Alt-Left":function(f){
 		}
 	}
 });

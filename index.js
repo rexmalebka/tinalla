@@ -7,6 +7,8 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const fs = require('fs')
 
+const net = require('net')
+
 const OSCServer = new osc.UDPPort({
 	localAddress: config.OSCLocalAddr,
 	localPort: config.OSCLocalPort,
@@ -70,18 +72,12 @@ OSCServer.on('ready', function(){
 					return {type: 's', value: JSON.stringify(arg)}				
 				}
 			});
-			try{
-				console.log(`sending: ${opts.ip}:${opts.port} -> ${address}, ${args}`)
+			console.log(`sending: ${opts.ip}:${opts.port} -> ${address}, ${args}`)
+
 				OSCServer.send({
 					address: address,
 					args: oscargs
 				}, opts.ip, opts.port);
-			}catch(error){
-				console.log(error)
-				console.log(`Error sending: ${opts.ip}:${opts.port} -> ${address}, ${args}`)			
-			}
-
-			
 		})
 	});
 

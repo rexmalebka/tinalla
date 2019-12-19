@@ -231,7 +231,6 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 	}
 
 	const regexrule = XRegExp(pat, flags)
-
 	oscdir = oscdir.startsWith('/') ? oscdir : '/'+oscdir 
 
 	// options are updatable
@@ -501,6 +500,31 @@ const Loop = function(timeout=[], sequence=[], times='inf'){
 	}
 }
 
+const Write = function(content, from, to){
+	if(content.constructor == RegExp){
+		//generates text
+		let gentext = new RandExp(content);
+		content = gentext.gen();
+	}
+	TextEditor.replaceRange(content, from, to)
+}
+
+const Markov = function(structure={}, corpus=null){
+	let keys = Object.keys(structure);
+	if(corpus==null){
+		corpus = keys[Math.floor(Math.random()*keys.length)]
+	}
+	/*
+	return {
+		ref: corpus,
+		next: function(){
+			
+			return structure[ref]
+		}
+	}
+	*/
+	return {}
+}
 
 function flashtext(from, to, bgcolor){
 	// from and to look like this: {line: 0, ch: 2}, {line:1, ch:0}
@@ -516,8 +540,6 @@ function flashtext(from, to, bgcolor){
 
 	setTimeout(deletemark, 250) //after certain time clear the mark
 }
-
-
 
 
 

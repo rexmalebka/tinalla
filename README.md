@@ -31,6 +31,9 @@ npm run start
 
 __Usage__
 
+*Regular Expresions*
+Regular expresion are patterns to filter data with certain structure, for example, an email usually looks like this: `someone@mail.com`, the mail strictly has an `@`, has a hosting and an alias, there should not be spaces or weird characters, we could describe the regex for filtering emails as `[a-zA-Z0-9-_]+@[a-zA-Z0-9-_]+\.com` where `a-z` means any
+
 there are two editor, a text editor where it's possible to write fluid text and the parsing editor, where the parsing rules are written.
 
 
@@ -44,6 +47,8 @@ there are two editor, a text editor where it's possible to write fluid text and 
 * `Ctrl-Enter` : Executes the regex rules in the current line / current selection
 * `Tab` : Focus the parsing editor.
 * onchange : Executes the regex rules if these are registered with `onchange: true`
+
+**
 
 __Documentation__
 
