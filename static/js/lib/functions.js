@@ -157,6 +157,7 @@ const Range = function(start, end, callback){
 		return {
 			Parse : function(rule, oscdir = '/tinalla', callback,){
 				let opts = {start: start, end: end};
+				_opts = {};
 				for(i in _opts){
 					opts[i] = _opts[i]
 				}
@@ -432,10 +433,18 @@ const Loop = function(timeout=[], sequence=[], times='inf'){
 					let t1 = new Date();
 					const rloop = function(){
 						if(!Tinalla.loops.hasOwnProperty(hash))	return false
+
+						if(Tinalla.loops[hash].timeout[(Tinalla.loops[hash].count % Tinalla.loops[hash].timeout.length)].constructor == Function){
+
+						Tinalla.loops[hash].timeout[(Tinalla.loops[hash].count % Tinalla.loops[hash].timeout.length)] = Tinalla.loops[hash].timeout[(Tinalla.loops[hash].count % Tinalla.loops[hash].timeout.length)]();
+
+						}
+
 						if((new Date() - t1) < Tinalla.loops[hash].timeout[(Tinalla.loops[hash].count % Tinalla.loops[hash].timeout.length)] ){
 							cancelAnimationFrame(Tinalla.loops[hash].idx)
 							Tinalla.loops[hash].idx = requestAnimationFrame(rloop)
 						}else{
+							// avoid waiting for function to end with promises
 							let exf = new Promise(function(resolve, reject){
 								Tinalla.loops[hash].sequence[Tinalla.loops[hash].count % Tinalla.loops[hash].sequence.length]()
 								resolve();

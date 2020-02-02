@@ -108,29 +108,143 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 			//autosave()
 			try{
 				let evaluated = eval(text);
-				cons.textContent = `${text} → ${typeof evaluated}`;
+				//cons.textContent = `${text} → ${typeof evaluated}`;
+				Console.print(evaluated, "notice")
 			}catch(error){
-				cons.textContent = error;
+				//cons.textContent = error;
+				Console.print(error, "error")
 			}
 		},
 		"Ctrl-Enter":function(f){
-			const text = ParseEditor.getLine(ParseEditor.getCursor().line);
+			let text = "";
+			if(ParseEditor.getSelection()==""){
+				text = ParseEditor.getLine(ParseEditor.getCursor().line);
+			}else{
+				text = ParseEditor.getSelection();
+			}
 			//autosave()
 			try{
 				let evaluated = eval(text);
-				cons.textContent = `${text} → ${typeof evaluated}`;
+				//cons.textContent = `${text} → ${typeof evaluated}`;
+				Console.print(evaluated, "notice")
 			}catch(error){
-				cons.textContent = error;
+				//cons.textContent = error;
+				Console.print(error, "error")
 			}	
 		},
 		"Tab":function(f){
+			console.log("F",f)
 			TextEditor.focus();
 			TextEditor.setCursor(0,0)
 		},
-		"Alt-Left":function(f){
+		"Alt-Repag":function(f){
+			/*
+			const EditorWidth = document.querySelector("#texteditor").getBoundingClientRect().width;
+			const ParseWidth = document.querySelector("#parse").getBoundingClientRect().width;
+
+			const total = EditorWidth + ParseWidth;
+
+			console.log(total);
+
+			if(EditorWidth > 150){
+				// calculate percentage
+				document.querySelector("#texteditor").style.width = (EditorWidth - 30) + "px";
+				document.querySelector("#parse").style.width = (Total - EditorWidth + 20) + "px";
+			}
+			*/
 		}
 	}
 });
 
 
+document.querySelectorAll(".save").forEach((node)=>{
+	node.onclick  = function(ev){
+		console.log("aaaa", ev)
+		const now = new Date();
+		let name = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}-${now.getHours()}:${now.getMinutes()}`;
+		let text = "";
+		if(ev.target.parentElement.parentElement.parentElement.id == "texteditor"){
+			text = TextEditor.getValue();
+			name = name + "-text.txt";
+		}else{
+			text = ParseEditor.getValue();
+			name = name + "-code.js";
+		}
 
+		const blob = new Blob([text], {type: (name.endsWith("js")? "application/javascript" : "text/plain")})
+
+		let a = document.createElement("a");
+		a.download = name;
+		a.href = (window.webkitURL || window.URL).createObjectURL(blob);
+		a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
+		a.click();
+	}
+});
+
+
+document.querySelectorAll(".clear").forEach( (node)=>{
+	node.onclick  = function(ev){
+		if(ev.target.parentElement.parentElement.parentElement.id == "texteditor"){
+			TextEditor.setValue("");
+		}else{
+			ParseEditor.setValue("");
+		}
+	}
+});
+
+document.querySelectorAll(".load").forEach( (node)=>{
+	node.onclick  = function(ev){
+		let inpt = document.createElement("input")
+		inpt.type = "file";
+
+		inpt.onchange = function(e){
+			const file = e.target.files[0];
+
+			let reader = new FileReader();
+			reader.onload = function(reader){
+				content = reader.target.result;
+				if(ev.target.parentElement.parentElement.parentElement.id == "texteditor"){
+					TextEditor.setValue(content);
+				}else{
+					ParseEditor.setValue(content);
+				}
+			}
+
+			reader.readAsText(file);
+		}
+
+		inpt.click()
+	}
+});
+
+
+
+
+const Console = {
+	print : function(log, type){
+		let container = document.createElement("div");
+		if(type == "error"){
+			let error = document.createElement("code")
+			error.classList.add("errorlog")
+			container.textContent = "[E] ";
+			error.textContent = log;
+			container.appendChild(error)
+			cons.querySelector("#log").appendChild(container);
+		}else{
+			let notice = document.createElement("code")
+			notice.textContent = ">> "+log;
+			container.appendChild(notice)
+			cons.querySelector("#log").appendChild(container);
+		}
+		cons.querySelector("#log").scrollTo(0, cons.querySelector("#log").scrollHeight)
+	}
+}
+
+
+for(let k=0;k<10;k++){
+	Console.print("hola "+k, "error")
+}
+
+for(let k=0;k<10;k++){
+	Console.print("everything'sok "+k, "notice")
+}
