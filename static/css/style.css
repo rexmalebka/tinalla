@@ -25,6 +25,7 @@ body{
 }
 
 #parse{
+	height:100%;
 	width:40%;
 	border:1px solid white;
 	display:inline-flex;
