@@ -30,7 +30,6 @@ const Tinalla = {
 			return obj[prop]
 		},
 		set: function(obj, prop, value){
-			console.log("adsfasdf", prop, value)
 			obj[prop] = value;
 		}
 	})
@@ -133,7 +132,6 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 			}	
 		},
 		"Tab":function(f){
-			console.log("F",f)
 			TextEditor.focus();
 			TextEditor.setCursor(0,0)
 		},
@@ -144,7 +142,6 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 
 			const total = EditorWidth + ParseWidth;
 
-			console.log(total);
 
 			if(EditorWidth > 150){
 				// calculate percentage
@@ -159,7 +156,6 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 
 document.querySelectorAll(".save").forEach((node)=>{
 	node.onclick  = function(ev){
-		console.log("aaaa", ev)
 		const now = new Date();
 		let name = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}-${now.getHours()}:${now.getMinutes()}`;
 		let text = "";
@@ -241,10 +237,4 @@ const Console = {
 }
 
 
-for(let k=0;k<10;k++){
-	Console.print("hola "+k, "error")
-}
 
-for(let k=0;k<10;k++){
-	Console.print("everything'sok "+k, "notice")
-}
