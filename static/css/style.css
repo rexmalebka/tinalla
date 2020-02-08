@@ -1,67 +1,45 @@
 body{
 	background:#0F192A;
+	margin:auto;
+	font-size:14px;
+	color:white;
+	overflow:hidden;
+}
+#all{
+	width:100%;
+	height:90vh;
+	display: flex;
+	flex-wrap:wrap;
+	align-items:stretch;
+	overflow:none;
 }
 
 #texteditor{
-	padding:0.5%;
-	width:50%;
-	height:90vh;
-	float: left;
-	color:white;
+	padding:1em;
+	flex-grow:0;
+	width:60%;
+	height:100%;
 	border:1px solid white;
+	overflow:scroll;	
+	box-sizing:border-box;
 }
+
 #parse{
+	width:40%;
 	border:1px solid white;
-	width:48%;
-	height:70vh;
-	float:right;
-	display:block;
-}
-#console{
-	width:47%;
-	height:17%;
-	border:1px solid white;
-	color:yellow;
-	position:absolute;
-	top:75%;
-	float:right;
-	display:block;
+	display:inline-flex;
+	flex-direction:column;
+	box-sizing:border-box;
 }
 #parseeditor{
-	width:100%;
-	height:95%;
-	float:right;
-	color:white;
-	display:block;
-}
+	padding:1em;
+	height:90%;
+	border:1px solid white;
+	overflow:scroll;	
 
+}
 .CodeMirror{
-	font-size:20px;
-	margin:3px;
-	height:95%;
-}
-
-.console{
-	font-family: monospace;
-	font-size:14px;
-	position: absolute;
-	width:100%;
-	height:2em;
-	z-index:6;
-	bottom:0;
-	color:white;
-	left:50px;
-}
-
-
-.blink{
-	animation: blinker 0.5s linear;
-}
-
-@keyframes blinker {
-      	10% {
-		background-color:rgba(0,0,0,0);
-      	}
+	height:100%;
 }
 
 ul{
@@ -71,26 +49,43 @@ ul{
   	overflow: hidden;
 }
 
-li {
-  float: left;
+li{
+	float:left;
 }
 
 li a{
-	display: block;
-      	color: white;
-      	text-align: center;
-      	padding: 14px 16px;
-      	text-decoration: none;
+	color:white;
+	text-decoration:none;
+	display:block;
+	padding:1em;
 }
-
 li a:hover{
 	background-color:blue;
+}
+
+
+#console{
+	margin:1em;
+	width:100%;
+	height:15%;
+	color:yellow;
+	float:left;
+	position:relative;
+}
+.console{
+	font-family: monospace;
+	font-size:14px;
+	width:100%;
+	height:10%;
+	z-index:6;
+	color:white;
 }
 
 #log{
 	width:100%;
 	height:70%;
 	overflow-y:scroll;
+	position:absolute;
 }
 
 #log div{
@@ -101,4 +96,14 @@ li a:hover{
 
 .errorlog{
 	color:red;
+}
+
+.blink{
+	animation: blinker 0.5s linear;
+}
+
+@keyframes blinker {
+      	10% {
+		background-color:rgba(0,0,0,0);
+      	}
 }
