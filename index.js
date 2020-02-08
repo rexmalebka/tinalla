@@ -52,12 +52,13 @@ OSCServer.on('ready', function(){
 			}
 		})
 
-		socket.on('plugin', function(plugin, args){
+		socket.on('plugin', function(plugin, ...args){
+
 			if(Object.keys(plugins).includes(plugin) ){
 
 				let syncFunc= new Promise((resolve, reject)=>{
 					try{
-						resolve(`plugin ${plugin}: ${plugins[plugin](args)}`);
+						resolve(`plugin ${plugin}: ${plugins[plugin](...args)}`);
 					}catch(error){
 						error.message = `error on plugin ${plugin}: ${error.message}`
 						reject(error)
