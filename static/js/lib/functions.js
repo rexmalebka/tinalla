@@ -2,9 +2,11 @@ const socket = io('http://localhost:8000')
 
 socket.on('connect', function(){
 	console.log("connected");
+	Console.print("connected")
 });
 
 socket.on('load', function(texteditor, parsereditor){
+	Console.print("loading")
 	console.log("loading ")
 	TextEditor.setValue(texteditor)
 	ParseEditor.setValue(parsereditor)
@@ -23,6 +25,7 @@ socket.on('event', function(data){
 });
 
 socket.on('disconnect', function(){
+	Console.print("disconnected","error")
 	console.log("disconnected");
 });
 
@@ -146,15 +149,25 @@ const RemoveRule = function(rule){
  * @property {Function} res.AddRule - AddRule function into text range.
  */
 const Range = function(start, end, callback){
-	if( Number.isInteger(start) && Number.isInteger(end) ){
-		start = {line:start, ch:0};
-		end = {line:end};
+	
+	if( Number.isInteger(start)){
+		start = {line:start, ch:0}
+	}
+
+	if( Number.isInteger(end)){
+		end = {line:end, ch:0}
+	}else if(end == undefined){
+		ch = TextEditor.getRange(start,{line:start.line}).length
+		end = {line: start.line, ch: ch}
 	}
 	
 	if(callback && callback.constructor == Function){
 		callback(range)
 	}else{
 		return {
+			text: function(){
+				return TextEditor.getRange(start,end)
+			},
 			Parse : function(rule, oscdir = '/tinalla', callback,){
 				let opts = {start: start, end: end};
 				_opts = {};
@@ -208,6 +221,17 @@ const Range = function(start, end, callback){
  */
 const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 
+	if (oscdir && typeof oscdir == 'function' ){
+		oscdir = ''
+		
+		if(typeof callback === 'object' && callback.constructor === Object){
+			opts = arguments[2]
+		}
+
+		callback = arguments[1]
+
+	}
+
 	let flags = 'x';
 	let pat = rule;
 	let defopts = {
@@ -230,6 +254,8 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 			flags = pat.flags;
 		}
 	}
+	
+
 
 	const regexrule = XRegExp(pat, flags)
 	oscdir = oscdir.startsWith('/') ? oscdir : '/'+oscdir 
@@ -277,10 +303,22 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 	let ret = [];
 	if (callback && typeof callback == 'function' ){
 		res = _parse();
+
+
+		res = res.map((r)=>{
+			r.start = {
+				line: r.start.line + defopts.start.line,
+				ch: r.start.ch + defopts.start.ch
+			}
+			r.end = {
+				line: r.end.line + defopts.start.line,
+				ch: r.end.ch + defopts.start.ch
+			}
+			return r
+		})
 		if(defopts.iterable){
 
 			res.forEach(function(found, n){
-				console.log("RES it", found, n )
 				
 				if(callback.length == 1){
 					ret = callback(found);

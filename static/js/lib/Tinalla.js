@@ -1,5 +1,10 @@
 const cons = document.querySelector("#console");
+const DOMparse = document.querySelector("#parse");
+const DOMpeditor = document.querySelector("#parseeditor");
+const DOMeditor = document.querySelector("#texteditor");
 
+//teditor.style.width = "50%"
+//peditor.style.width = "40%"
 /**
  * Tinalla main mother object.
  * @typedef Tinalla
@@ -30,7 +35,6 @@ const Tinalla = {
 			return obj[prop]
 		},
 		set: function(obj, prop, value){
-			console.log("adsfasdf", prop, value)
 			obj[prop] = value;
 		}
 	})
@@ -80,7 +84,40 @@ const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 		"Tab":function(){
 			ParseEditor.focus();
 			ParseEditor.setCursor(0,0)
-		}
+		},
+		"Shift-Ctrl-H":function(){
+
+			DOMparse.style.display = DOMparse.style.display == "none" ? "inline-flex" : "none"
+			//teditor.style.width = teditor.style.width == "50%" || teditor.style.width == "" ? "90%" : "50%"
+			DOMeditor.style['flex-grow'] = DOMeditor.style['flex-grow'] == "2" ? "" : "2" 
+			TextEditor.focus();
+		},
+		"Ctrl-Up":function(){
+			let fontsize = parseFloat(window.getComputedStyle(DOMeditor.querySelector('.CodeMirror'), null)['font-size'])
+			DOMeditor.querySelector('.CodeMirror').style.fontSize = (fontsize+1)+'px'
+		},
+		"Ctrl-Down":function(){
+			let fontsize = parseFloat(window.getComputedStyle(DOMeditor.querySelector('.CodeMirror'), null)['font-size'])
+			DOMeditor.querySelector('.CodeMirror').style.fontSize = (fontsize-1)+'px'
+		},
+		"Ctrl-Right":function(){
+			let weditor = parseFloat(window.getComputedStyle(DOMeditor, null)['width'])
+			let wparse = parseFloat(window.getComputedStyle(DOMparse, null)['width'])
+
+			if(wparse / (wparse + weditor) > 0.20){
+				DOMeditor.style.width = (weditor + 10)+"px"
+				DOMparse.style.width = (wparse - 10)+"px"
+			}
+		},
+		"Ctrl-Left":function(){
+			let weditor = parseFloat(window.getComputedStyle(DOMeditor, null)['width'])
+			let wparse = parseFloat(window.getComputedStyle(DOMparse, null)['width'])
+
+			if(wparse / (wparse + weditor) < 0.80){
+				DOMeditor.style.width = (weditor - 10)+"px"
+				DOMparse.style.width = (wparse + 10)+"px"
+			}
+		},
 	}
 });
 
@@ -133,9 +170,15 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 			}	
 		},
 		"Tab":function(f){
-			console.log("F",f)
 			TextEditor.focus();
 			TextEditor.setCursor(0,0)
+		},
+		"Shift-Ctrl-H":function(){
+
+			DOMparse.style.display = "none"
+			//teditor.style.width = "95%"
+			DOMeditor.style['flex-grow'] = DOMeditor.style['flex-grow'] == "2" ? "" : "2" 
+			TextEditor.focus();
 		},
 		"Alt-Repag":function(f){
 			/*
@@ -144,7 +187,6 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 
 			const total = EditorWidth + ParseWidth;
 
-			console.log(total);
 
 			if(EditorWidth > 150){
 				// calculate percentage
@@ -152,14 +194,39 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 				document.querySelector("#parse").style.width = (Total - EditorWidth + 20) + "px";
 			}
 			*/
-		}
+		},
+		"Ctrl-Up":function(){
+			let fontsize = parseFloat(window.getComputedStyle(DOMpeditor.querySelector('.CodeMirror'), null)['font-size'])
+			DOMpeditor.querySelector('.CodeMirror').style.fontSize = (fontsize+1)+'px'
+		},
+		"Ctrl-Down":function(){
+			let fontsize = parseFloat(window.getComputedStyle(DOMpeditor.querySelector('.CodeMirror'), null)['font-size'])
+			DOMpeditor.querySelector('.CodeMirror').style.fontSize = (fontsize-1)+'px'
+		},
+		"Ctrl-Right":function(){
+			let weditor = parseFloat(window.getComputedStyle(DOMeditor, null)['width'])
+			let wparse = parseFloat(window.getComputedStyle(DOMparse, null)['width'])
+
+			if(wparse / (wparse + weditor) > 0.20){
+				DOMeditor.style.width = (weditor + 10)+"px"
+				DOMparse.style.width = (wparse - 10)+"px"
+			}
+		},
+		"Ctrl-Left":function(){
+			let weditor = parseFloat(window.getComputedStyle(DOMeditor, null)['width'])
+			let wparse = parseFloat(window.getComputedStyle(DOMparse, null)['width'])
+
+			if(wparse / (wparse + weditor) < 0.80){
+				DOMeditor.style.width = (weditor - 10)+"px"
+				DOMparse.style.width = (wparse + 10)+"px"
+			}
+		},
 	}
 });
 
 
 document.querySelectorAll(".save").forEach((node)=>{
 	node.onclick  = function(ev){
-		console.log("aaaa", ev)
 		const now = new Date();
 		let name = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}-${now.getHours()}:${now.getMinutes()}`;
 		let text = "";
@@ -241,10 +308,4 @@ const Console = {
 }
 
 
-for(let k=0;k<10;k++){
-	Console.print("hola "+k, "error")
-}
 
-for(let k=0;k<10;k++){
-	Console.print("everything'sok "+k, "notice")
-}
