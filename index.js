@@ -18,6 +18,25 @@ const OSCServer = new osc.UDPPort({
 });
 OSCServer.open();
 
+console.log("reaading plugins dir.")
+
+const plugins = {}
+
+fs.readdirSync('./'+config.PluginsDir).forEach((file)=>{
+	if (file.endsWith('.js')){
+		try{
+			let plugin = require(config.PluginsDir+'/'+file)
+			if (Object.keys(plugin).includes("address") &&  Object.keys(plugin).includes('callback')){
+				plugins[plugin.address] = plugin.callback
+			}
+		}catch(error){
+			console.log("error loading "+file+" \n "+error)
+		}
+	}
+})
+
+console.log(`plugins loaded: "${Object.keys(plugins).join(", ")}"`)
+
 OSCServer.on('ready', function(){
 	console.log('OSC started.');
 
@@ -30,7 +49,26 @@ OSCServer.on('ready', function(){
 			}else{
 				const dataparsed = JSON.parse(data)
 				socket.emit('load',dataparsed.texteditor, dataparsed.parsereditor)
-			}	
+			}
+		})
+
+		socket.on('plugin', function(plugin, args){
+			if(Object.keys(plugins).includes(plugin) ){
+
+				let syncFunc= new Promise((resolve, reject)=>{
+					try{
+						resolve(`plugin ${plugin}: ${plugins[plugin](args)}`);
+					}catch(error){
+						error.message = `error on plugin ${plugin}: ${error.message}`
+						reject(error)
+					}
+				}).then((log)=>{
+					console.log(log)
+				}).catch((error)=>{
+					console.log("Error in plugin", error)
+				})
+
+			}
 		})
 
 		socket.on('save',function(text, parser){
