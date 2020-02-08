@@ -1,5 +1,10 @@
 const cons = document.querySelector("#console");
+const DOMparse = document.querySelector("#parse");
+const DOMpeditor = document.querySelector("#parseeditor");
+const DOMeditor = document.querySelector("#texteditor");
 
+//teditor.style.width = "50%"
+//peditor.style.width = "40%"
 /**
  * Tinalla main mother object.
  * @typedef Tinalla
@@ -79,7 +84,40 @@ const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 		"Tab":function(){
 			ParseEditor.focus();
 			ParseEditor.setCursor(0,0)
-		}
+		},
+		"Shift-Ctrl-H":function(){
+
+			DOMparse.style.display = DOMparse.style.display == "none" ? "inline-flex" : "none"
+			//teditor.style.width = teditor.style.width == "50%" || teditor.style.width == "" ? "90%" : "50%"
+			DOMeditor.style['flex-grow'] = DOMeditor.style['flex-grow'] == "2" ? "" : "2" 
+			TextEditor.focus();
+		},
+		"Ctrl-Up":function(){
+			let fontsize = parseFloat(window.getComputedStyle(DOMeditor.querySelector('.CodeMirror'), null)['font-size'])
+			DOMeditor.querySelector('.CodeMirror').style.fontSize = (fontsize+1)+'px'
+		},
+		"Ctrl-Down":function(){
+			let fontsize = parseFloat(window.getComputedStyle(DOMeditor.querySelector('.CodeMirror'), null)['font-size'])
+			DOMeditor.querySelector('.CodeMirror').style.fontSize = (fontsize-1)+'px'
+		},
+		"Ctrl-Right":function(){
+			let weditor = parseFloat(window.getComputedStyle(DOMeditor, null)['width'])
+			let wparse = parseFloat(window.getComputedStyle(DOMparse, null)['width'])
+
+			if(wparse / (wparse + weditor) > 0.20){
+				DOMeditor.style.width = (weditor + 10)+"px"
+				DOMparse.style.width = (wparse - 10)+"px"
+			}
+		},
+		"Ctrl-Left":function(){
+			let weditor = parseFloat(window.getComputedStyle(DOMeditor, null)['width'])
+			let wparse = parseFloat(window.getComputedStyle(DOMparse, null)['width'])
+
+			if(wparse / (wparse + weditor) < 0.80){
+				DOMeditor.style.width = (weditor - 10)+"px"
+				DOMparse.style.width = (wparse + 10)+"px"
+			}
+		},
 	}
 });
 
@@ -135,6 +173,13 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 			TextEditor.focus();
 			TextEditor.setCursor(0,0)
 		},
+		"Shift-Ctrl-H":function(){
+
+			DOMparse.style.display = "none"
+			//teditor.style.width = "95%"
+			DOMeditor.style['flex-grow'] = DOMeditor.style['flex-grow'] == "2" ? "" : "2" 
+			TextEditor.focus();
+		},
 		"Alt-Repag":function(f){
 			/*
 			const EditorWidth = document.querySelector("#texteditor").getBoundingClientRect().width;
@@ -149,7 +194,33 @@ const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 				document.querySelector("#parse").style.width = (Total - EditorWidth + 20) + "px";
 			}
 			*/
-		}
+		},
+		"Ctrl-Up":function(){
+			let fontsize = parseFloat(window.getComputedStyle(DOMpeditor.querySelector('.CodeMirror'), null)['font-size'])
+			DOMpeditor.querySelector('.CodeMirror').style.fontSize = (fontsize+1)+'px'
+		},
+		"Ctrl-Down":function(){
+			let fontsize = parseFloat(window.getComputedStyle(DOMpeditor.querySelector('.CodeMirror'), null)['font-size'])
+			DOMpeditor.querySelector('.CodeMirror').style.fontSize = (fontsize-1)+'px'
+		},
+		"Ctrl-Right":function(){
+			let weditor = parseFloat(window.getComputedStyle(DOMeditor, null)['width'])
+			let wparse = parseFloat(window.getComputedStyle(DOMparse, null)['width'])
+
+			if(wparse / (wparse + weditor) > 0.20){
+				DOMeditor.style.width = (weditor + 10)+"px"
+				DOMparse.style.width = (wparse - 10)+"px"
+			}
+		},
+		"Ctrl-Left":function(){
+			let weditor = parseFloat(window.getComputedStyle(DOMeditor, null)['width'])
+			let wparse = parseFloat(window.getComputedStyle(DOMparse, null)['width'])
+
+			if(wparse / (wparse + weditor) < 0.80){
+				DOMeditor.style.width = (weditor - 10)+"px"
+				DOMparse.style.width = (wparse + 10)+"px"
+			}
+		},
 	}
 });
 

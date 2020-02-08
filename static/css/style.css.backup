@@ -1,0 +1,113 @@
+body{
+	background:#0F192A;
+	margin:auto;
+}
+
+#all{
+	width95vh;
+	height:90vh;
+	margin:auto;
+	display:flex;
+	flex-direction:row;
+	justify-elements:center;
+}
+#texteditor{
+	padding:1em;
+	height:90vh;
+	float: left;
+	color:white;
+	border:1px solid white;
+	overflow:scroll;
+}
+#parse{
+	border:1px solid white;
+	height:90vh;
+	float:left;
+}
+#console{
+	margin:0;
+	padding:1em 0em 0em 1em;
+	width:100%;
+	height:15%;
+	border:1px solid white;
+	color:yellow;
+	float:left;
+	clear:left;
+}
+#parseeditor{
+	margin:1em;
+	width:100%;
+	height:80%;
+	color:white;
+	float:left;
+	clear:left;
+	overflow:scroll;
+}
+
+.CodeMirror{
+	font-size:20px;
+	margin:3px;
+	height:95%;
+}
+
+.console{
+	font-family: monospace;
+	font-size:14px;
+	position: absolute;
+	width:100%;
+	height:2em;
+	z-index:6;
+	bottom:0;
+	color:white;
+	left:50px;
+}
+
+
+.blink{
+	animation: blinker 0.5s linear;
+}
+
+@keyframes blinker {
+      	10% {
+		background-color:rgba(0,0,0,0);
+      	}
+}
+
+ul{
+	list-style-type: none;
+	margin: 0;
+     	padding: 0;
+  	overflow: hidden;
+}
+
+li {
+  float: left;
+}
+
+li a{
+	display: block;
+      	color: white;
+      	text-align: center;
+      	padding: 14px 16px;
+      	text-decoration: none;
+}
+
+li a:hover{
+	background-color:blue;
+}
+
+#log{
+	width:100%;
+	height:70%;
+	overflow-y:scroll;
+}
+
+#log div{
+	display:block;
+	font-family: monospace;
+	font-size:14px;
+}
+
+.errorlog{
+	color:red;
+}
