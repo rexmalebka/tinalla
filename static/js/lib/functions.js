@@ -518,7 +518,7 @@ const Write = function(content, from, to){
 	TextEditor.replaceRange(content, from, to)
 }
 
-const Markov = function(structure={}, corpus=null){
+/*const Markov = function(structure={}, corpus=null){
 	let keys = Object.keys(structure);
 	if(corpus==null){
 		corpus = keys[Math.floor(Math.random()*keys.length)]
@@ -531,9 +531,10 @@ const Markov = function(structure={}, corpus=null){
 			return structure[ref]
 		}
 	}
-	*/
 	return {}
 }
+
+	*/
 
 function flashtext(from, to, bgcolor){
 	// from and to look like this: {line: 0, ch: 2}, {line:1, ch:0}
@@ -552,3 +553,11 @@ function flashtext(from, to, bgcolor){
 
 
 
+const Plugin = function(name,...params){
+
+	
+	return socket.emit('plugin',
+		name,
+		...params
+	)
+}
