@@ -20,22 +20,25 @@ OSCServer.open();
 
 console.log("reaading plugins dir.")
 
-const plugins = {}
 
-fs.readdirSync('./'+config.PluginsDir).forEach((file)=>{
-	if (file.endsWith('.js')){
-		try{
-			let plugin = require(config.PluginsDir+'/'+file)
-			if (Object.keys(plugin).includes("address") &&  Object.keys(plugin).includes('callback')){
-				plugins[plugin.address] = plugin.callback
+	let plugins = {}
+
+	fs.readdirSync('./'+config.PluginsDir).forEach((file)=>{
+		if (file.endsWith('.js')){
+			try{
+				let plugin = require(config.PluginsDir+'/'+file)
+				if (Object.keys(plugin).includes("address") &&  Object.keys(plugin).includes('callback')){
+					plugins[plugin.address] = plugin.callback
+				}
+			}catch(error){
+				console.log("error loading "+file+" \n "+error)
 			}
-		}catch(error){
-			console.log("error loading "+file+" \n "+error)
 		}
-	}
-})
+	})
 
-console.log(`plugins loaded: "${Object.keys(plugins).join(", ")}"`)
+	console.log(`plugins loaded: "${Object.keys(plugins).join(", ")}"`)
+
+
 
 OSCServer.on('ready', function(){
 	console.log('OSC started.');
@@ -58,7 +61,15 @@ OSCServer.on('ready', function(){
 
 				let syncFunc= new Promise((resolve, reject)=>{
 					try{
-						resolve(`plugin ${plugin}: ${plugins[plugin](...args)}`);
+						let result = plugins[plugin].bind(
+							{
+								socket: socket,
+								io: io,
+								emit: function(...params){
+									socket.emit(`plugin-${plugin}`, ...params)								}
+							}
+						)(...args)
+						resolve(`plugin ${plugin}: ${result}`);
 					}catch(error){
 						error.message = `error on plugin ${plugin}: ${error.message}`
 						reject(error)
