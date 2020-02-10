@@ -592,10 +592,16 @@ function flashtext(from, to, bgcolor){
 
 
 const Plugin = function(name,...params){
-
 	
-	return socket.emit('plugin',
+	socket.emit('plugin',
 		name,
 		...params
 	)
+	return {
+		receive: function(callback){
+			socket.once(`plugin-${name}`, function(...args){
+				callback(...args)
+			})
+		}
+	}
 }
