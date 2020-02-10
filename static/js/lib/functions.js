@@ -547,13 +547,29 @@ const Loop = function(timeout=[], sequence=[], times='inf'){
 	}
 }
 
-const Write = function(content, from, to){
+const Write = function(content, start, end){
+	if(!start && !end){
+		start = {line:0, ch:0}
+		end = {line: TextEditor.lineCount(), ch:0}
+	}
+
+	if( Number.isInteger(start)){
+		start = {line:start, ch:0}
+	}
+
+	if( Number.isInteger(end)){
+		end = {line:end, ch:0}
+	}else if(end == undefined){
+		ch = TextEditor.getRange(start,{line:start.line}).length
+		end = {line: start.line, ch: ch}
+	}
+	
 	if(content.constructor == RegExp){
 		//generates text
 		let gentext = new RandExp(content);
 		content = gentext.gen();
 	}
-	TextEditor.replaceRange(content, from, to)
+	TextEditor.replaceRange(content, start, end)
 }
 
 /*const Markov = function(structure={}, corpus=null){
