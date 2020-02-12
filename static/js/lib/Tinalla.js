@@ -130,8 +130,16 @@ TextEditor.on('change', function(...args){
 })
 
 TextEditor.on('cursorActivity',function(...args){
-	let pos = TextEditor.getCursor()
-	document.querySelector("#cursorposition").textContent = `line: ${pos.line}, ch: ${pos.ch}`
+	if(TextEditor.getSelection() == ""){
+		let pos = TextEditor.getCursor()
+		document.querySelector("#cursorposition").textContent = `line: ${pos.line}, ch: ${pos.ch}`
+
+	}else{
+		let start = TextEditor.listSelections()[0].anchor
+		let end = TextEditor.listSelections()[0].head
+		
+		document.querySelector("#cursorposition").textContent = `line: ${start.line}, ch: ${start.ch} -> line: ${end.line}, ch: ${end.ch}`
+	}
 })
 const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 	theme:"midnight", 
