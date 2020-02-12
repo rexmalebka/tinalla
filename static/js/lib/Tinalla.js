@@ -122,7 +122,6 @@ const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 });
 
 TextEditor.on('change', function(...args){
-
 	for(rule in Tinalla.rules){
 		if(Tinalla.rules[rule].onchange){
 			Tinalla.rules[rule]();
@@ -130,6 +129,10 @@ TextEditor.on('change', function(...args){
 	}
 })
 
+TextEditor.on('cursorActivity',function(...args){
+	let pos = TextEditor.getCursor()
+	document.querySelector("#cursorposition").textContent = `line: ${pos.line}, ch: ${pos.ch}`
+})
 const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 	theme:"midnight", 
 	lineNumbers: true,
