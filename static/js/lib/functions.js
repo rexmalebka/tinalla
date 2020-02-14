@@ -109,7 +109,30 @@ Array.prototype.Loop = function(timeout, times){
  *
  *
  */
-const AddRule = function(rule, oscdir = '/tinalla', callback, opts={}){
+const AddRule = function(...params){
+//const AddRule = function(rule, oscdir = '/tinalla', callback, opts={}){
+	let rule = ""
+	let oscdir = ""
+	let callback = ()=>{}
+	let opts = {}
+	if(arguments.length==4){
+		rule = params[0]
+		oscdir = params[1]
+		callback = params[2]
+		opts = params[3]
+	}else if(arguments.length==3 && typeof(arguments[1])=="string"){
+		rule = params[0]
+		oscdir = params[1]
+		callback = params[2]
+	}else if(arguments.length==3){
+		rule = params[0]
+		callback = params[1]
+		opts = params[2]
+	}else if(arguments.length==2){
+		rule = params[0]
+		callback = params[1]
+	}
+
 	Tinalla.rules[rule] = (_opts={})=>{
 		for(i in _opts){
 			opts[i] = _opts[i]
@@ -168,13 +191,14 @@ const Range = function(start, end, callback){
 			text: function(){
 				return TextEditor.getRange(start,end)
 			},
-			Parse : function(rule, oscdir = '/tinalla', callback,){
+			Parse : function(...params){
+				
 				let opts = {start: start, end: end};
 				_opts = {};
 				for(i in _opts){
 					opts[i] = _opts[i]
 				}
-				Parse(rule, oscdir = '/tinalla', callback, opts)
+				Parse(...params, opts)
 			},
 			AddRule : function(rule, oscdir = '/tinalla', callback, _opts={}){
 				let opts = {start: start, end: end};
@@ -219,8 +243,31 @@ const Range = function(start, end, callback){
  * @property {String} res.res - string match result.
  * @property {Array} res.raw - resulting array in the XRegExp format.
  */
-const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
-
+const Parse = function(...params){
+	//const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
+	//
+	let rule = ""
+	let oscdir = ""
+	let callback = ()=>{}
+	let opts = {}
+	if(arguments.length==4){
+		rule = params[0]
+		oscdir = params[1]
+		callback = params[2]
+		opts = params[3]
+	}else if(arguments.length==3 && typeof(arguments[1])=="string"){
+		rule = params[0]
+		oscdir = params[1]
+		callback = params[2]
+	}else if(arguments.length==3){
+		rule = params[0]
+		callback = params[1]
+		opts = params[2]
+	}else if(arguments.length==2){
+		rule = params[0]
+		callback = params[1]
+	}
+	/*
 	if (oscdir && typeof oscdir == 'function' ){
 		oscdir = ''
 		
@@ -231,6 +278,7 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 		callback = arguments[1]
 
 	}
+	*/
 
 	let flags = 'x';
 	let pat = rule;
@@ -301,9 +349,26 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 	}
 	let res = [];
 	let ret = [];
+	
 	if (callback && typeof callback == 'function' ){
 		res = _parse();
+		let _callback = function(){
+			if(arguments.length==2){
+				try{
+					callback(arguments[0], arguments[1])
+				}catch(error){
+					Console.print(error,"error")
+				}
+			
+			}else if(arguments.length==1){
+				try{
+					callback(arguments[0])
+				}catch(error){
+					Console.print(error,"error")
+				}
 
+			}		
+		}
 
 		res = res.map((r)=>{
 			r.start = {
@@ -321,9 +386,9 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 			res.forEach(function(found, n){
 				
 				if(callback.length == 1){
-					ret = callback(found);
+					ret = _callback(found);
 				}else if(callback.length == 2){
-					ret = callback(found, n);
+					ret = _callback(found, n);
 				}			
 				if(ret){
 					socket.emit('osc', oscdir, {
@@ -336,7 +401,7 @@ const Parse = function(rule, oscdir = '/tinalla', callback, opts={}){
 
 		}else{
 			if(res.length>0){
-				ret = callback(res);
+				ret = _callback(res);
 				if(ret){
 					socket.emit('osc', oscdir, {
 						ip: defopts.ip,
@@ -547,13 +612,29 @@ const Loop = function(timeout=[], sequence=[], times='inf'){
 	}
 }
 
-const Write = function(content, from, to){
+const Write = function(content, start, end){
+	if(!start && !end){
+		start = {line:0, ch:0}
+		end = {line: TextEditor.lineCount(), ch:0}
+	}
+
+	if( Number.isInteger(start)){
+		start = {line:start, ch:0}
+	}
+
+	if( Number.isInteger(end)){
+		end = {line:end, ch:0}
+	}else if(end == undefined){
+		ch = TextEditor.getRange(start,{line:start.line}).length
+		end = {line: start.line, ch: ch}
+	}
+	
 	if(content.constructor == RegExp){
 		//generates text
 		let gentext = new RandExp(content);
 		content = gentext.gen();
 	}
-	TextEditor.replaceRange(content, from, to)
+	TextEditor.replaceRange(content, start, end)
 }
 
 /*const Markov = function(structure={}, corpus=null){

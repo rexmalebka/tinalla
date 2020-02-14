@@ -32,6 +32,13 @@ const Tinalla = {
 	rules : new Proxy({}, {
 
 		get: function(obj, prop){
+			if(prop == "hush"){
+				return ()=>{
+					for(i in obj){
+						delete obj[i];
+					}
+				}
+			}
 			return obj[prop]
 		},
 		set: function(obj, prop, value){
@@ -40,7 +47,10 @@ const Tinalla = {
 	})
 }
 
-Hush = Tinalla.loops.hush;
+Hush = ()=>{
+	Tinalla.loops.hush()
+	Tinalla.rules.hush()
+}
 
 const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 	theme:"midnight", 
@@ -65,8 +75,16 @@ const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 			let opts = {}
 
 			if(TextEditor.getSelection() == ""){
+				let range = {
+					line:TextEditor.getCursor().line,
+					ch:0
+				}
+				let line = TextEditor.getRange(range, {line:range.line})
+
+
 				opts.start = {line: TextEditor.getCursor().line, ch:0 }
-				opts.end = {line: TextEditor.getCursor().line+1}
+				opts.end = {line: TextEditor.getCursor().line, ch:line.length}
+
 
 			}else{
 				opts.start = TextEditor.listSelections()[0].head
@@ -122,7 +140,6 @@ const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 });
 
 TextEditor.on('change', function(...args){
-
 	for(rule in Tinalla.rules){
 		if(Tinalla.rules[rule].onchange){
 			Tinalla.rules[rule]();
@@ -130,6 +147,18 @@ TextEditor.on('change', function(...args){
 	}
 })
 
+TextEditor.on('cursorActivity',function(...args){
+	if(TextEditor.getSelection() == ""){
+		let pos = TextEditor.getCursor()
+		document.querySelector("#cursorposition").textContent = `line: ${pos.line}, ch: ${pos.ch}`
+
+	}else{
+		let start = TextEditor.listSelections()[0].anchor
+		let end = TextEditor.listSelections()[0].head
+		
+		document.querySelector("#cursorposition").textContent = `line: ${start.line}, ch: ${start.ch} -> line: ${end.line}, ch: ${end.ch}`
+	}
+})
 const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 	theme:"midnight", 
 	lineNumbers: true,
