@@ -7,12 +7,12 @@ function cleanlogs(log){
 }
 
 
-
 const Tidal = {
 	child: function(){
 		// check if tidal it's running
 		this.ghci = spawn('ghci')
 		this.ghci.stdin.setEncoding('utf-8')
+
 		this.ghci.stdin.write(":script plugins\/tidalcycles\/BootTidal.hs\n")
 
 		this.ghci.stderr.on('data', function(data){
@@ -32,6 +32,7 @@ const Tidal = {
 		this.write = function(text){
 			this.ghci.stdin.write(text+"\n")
 		}
+
 	},
 	emit: (data)=>{data}
 }
@@ -41,6 +42,7 @@ function TidalCycles(instruction){
 	Tidal.emit = this.emit
 	Tidal.write(instruction)
 }
+
 
 
 Tidal.child()

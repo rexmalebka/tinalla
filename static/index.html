@@ -9,30 +9,31 @@
 </head>
 <body>
 	<div id="all">
-	<div id="texteditor">
-		<label>Text</label>
-		<ul>
-			<li><a href="#" class="save">Save</a></li>
-			<li><a href="#" class="load">Load</a></li>
-			<li><a href="#" class="clear">Clear</a></li>
-			<li><a href="#">Connect</a></li>
-		</ul>
-	</div>
-	<div id="parse">
-		<div id="parseeditor">
-			<label>Parser</label>
+		<div id="texteditor">
+			<label>Text</label>
 			<ul>
 				<li><a href="#" class="save">Save</a></li>
 				<li><a href="#" class="load">Load</a></li>
 				<li><a href="#" class="clear">Clear</a></li>
-				<li><a href="#"></a></li>
+				<li><a href="#">Connect</a></li>
 			</ul>
+			<label id="cursorposition"> </label>
 		</div>
-		<div id="console">
-			<label>console</label>
-			<div id="log"></div>
+		<div id="parse">
+			<div id="parseeditor">
+				<label>Parser</label>
+				<ul>
+					<li><a href="#" class="save">Save</a></li>
+					<li><a href="#" class="load">Load</a></li>
+					<li><a href="#" class="clear">Clear</a></li>
+					<li><a href="#"></a></li>
+				</ul>
+			</div>
+			<div id="console">
+				<label>console</label>
+				<div id="log"></div>
+			</div>
 		</div>
-	</div>
 	</div>
 		
 	<script src="js/lib/codemirror.js"></script>
@@ -53,8 +54,9 @@
 	
 	<script src="js/plugins/nearest_word.js"></script>
 	<script src="js/plugins/espeak.js"></script>
+  <script src="js/plugins/markov.js"></script>
 	<script src="js/plugins/Tidalcycles.js"></script>
-
+ 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
 
 

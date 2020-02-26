@@ -51,7 +51,7 @@ OSCServer.on('ready', function(){
 				socket.emit('load','','')
 			}else{
 				const dataparsed = JSON.parse(data)
-				socket.emit('load',dataparsed.texteditor, dataparsed.parsereditor)
+				//socket.emit('load',dataparsed.texteditor, dataparsed.parsereditor)
 			}
 		})
 

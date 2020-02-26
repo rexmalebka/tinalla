@@ -140,7 +140,6 @@ const TextEditor = CodeMirror(document.querySelector("#texteditor"), {
 });
 
 TextEditor.on('change', function(...args){
-
 	for(rule in Tinalla.rules){
 		if(Tinalla.rules[rule].onchange){
 			Tinalla.rules[rule]();
@@ -148,6 +147,18 @@ TextEditor.on('change', function(...args){
 	}
 })
 
+TextEditor.on('cursorActivity',function(...args){
+	if(TextEditor.getSelection() == ""){
+		let pos = TextEditor.getCursor()
+		document.querySelector("#cursorposition").textContent = `line: ${pos.line}, ch: ${pos.ch}`
+
+	}else{
+		let start = TextEditor.listSelections()[0].anchor
+		let end = TextEditor.listSelections()[0].head
+		
+		document.querySelector("#cursorposition").textContent = `line: ${start.line}, ch: ${start.ch} -> line: ${end.line}, ch: ${end.ch}`
+	}
+})
 const ParseEditor = CodeMirror(document.querySelector("#parseeditor"), {
 	theme:"midnight", 
 	lineNumbers: true,
