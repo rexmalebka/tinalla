@@ -10,6 +10,12 @@ const TidalCycles = function(){
 		}
 
 	}
+
+	if(arguments.length==1){
+		Plugin('TidalCycles', arguments[0])
+	}
+
+
 	return {
 		kill: function(){
 			document.querySelector("#tidalcycles").remove()
